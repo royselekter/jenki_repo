@@ -1,58 +1,58 @@
-<?xml version="1.1" encoding="UTF-8"?><flow-definition plugin="workflow-job@2.32">
-  <actions/>
-  <description/>
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.32">
+  <description></description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.0.7"/>
   </properties>
   <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.67">
     <script>node() {
-def DockerImage = "webserver:1.2"
+def DockerImage = &quot;webserver:1.2&quot;
 
-stage('Pre') { // Run pre-build steps
+stage(&apos;Pre&apos;) { // Run pre-build steps
   cleanWs()
-  sh "docker rm -f webserver || true"
+  sh &quot;docker rm -f webserver || true&quot;
 }
 
-stage('Git') { // Get code from GitLab repository
-  git branch: 'master',
-    url: 'https://github.com/royselekter/flask-http.git'
+stage(&apos;Git&apos;) { // Get code from GitLab repository
+  git branch: &apos;master&apos;,
+    url: &apos;https://github.com/royselekter/flask-http.git&apos;
 }
 
-stage('Build') { // Run the docker build
-  sh "docker build --tag ${DockerImage} ."
+stage(&apos;Build&apos;) { // Run the docker build
+  sh &quot;docker build --tag ${DockerImage} .&quot;
 }
-stage('Run') { // Run the built image
-  sh "docker run -d --name webserver --rm -p 8081:5000 ${DockerImage}; sleep 5"
+stage(&apos;Run&apos;) { // Run the built image
+  sh &quot;docker run -d --name webserver --rm -p 8081:5000 ${DockerImage}; sleep 5&quot;
 }
 
-stage('Test') { // Run tests on container
+stage(&apos;Test&apos;) { // Run tests on container
   def dockerOutput = sh (
-      script: 'curl http://localhost:8081/goaway',
-      //script: 'curl http://localhost:8081/goaway',
+      script: &apos;curl http://localhost:8081/goaway&apos;,
+      //script: &apos;curl http://localhost:8081/goaway&apos;,
       returnStdout: true
       ).trim()
-//  sh "docker rm -f webserver"
+//  sh &quot;docker rm -f webserver&quot;
 
-  if ( dockerOutput == 'GO AWAY!' ) {
-      currentBuild.result = 'SUCCESS'
+  if ( dockerOutput == &apos;GO AWAY!&apos; ) {
+      currentBuild.result = &apos;SUCCESS&apos;
   } else {
-      currentBuild.result = 'FAILURE'
-      sh "echo Webserver returned ${dockerOutput}"
+      currentBuild.result = &apos;FAILURE&apos;
+      sh &quot;echo Webserver returned ${dockerOutput}&quot;
   }
   return
 }
-stage('Push') { // Push the built image to docker hub
-   withDockerRegistry(credentialsId: 'docker-hub') {
-      sh "docker tag ${DockerImage} royselekter/${DockerImage}"
-      sh "docker push royselekter/${DockerImage}"
+stage(&apos;Push&apos;) { // Push the built image to docker hub
+   withDockerRegistry(credentialsId: &apos;docker_hub&apos;) {
+      sh &quot;docker tag ${DockerImage} royselekter/${DockerImage}&quot;
+      sh &quot;docker push royselekter/${DockerImage}&quot;
    }
 }
 
-stage ('Deploy') { // deploy to k8s
-  sshagent(credentials : ['ssh_jen']) {
-     sh 'ssh -o StrictHostKeyChecking=no ubuntu@192.168.10.40 uptime'
-     sh 'ssh ubuntu@192.168.10.40 ""kubectl apply -f /home/ubuntu/k8s_repo/k8s-pod.yml""'
+stage (&apos;Deploy&apos;) { // deploy to k8s
+  sshagent(credentials : [&apos;ssh_jen&apos;]) {
+     sh &apos;ssh -o StrictHostKeyChecking=no ubuntu@192.168.10.40 uptime&apos;
+     sh &apos;ssh ubuntu@192.168.10.40 &quot;&quot;kubectl apply -f /home/ubuntu/k8s_repo/k8s-pod.yml&quot;&quot;&apos;
    }
  }
 }</script>
@@ -60,4 +60,4 @@ stage ('Deploy') { // deploy to k8s
   </definition>
   <triggers/>
   <disabled>false</disabled>
-  </flow-definition>
+</flow-definition>
