@@ -60,3 +60,4 @@ stage ('Deploy') { // deploy to k8s
   </definition>
   <triggers/>
   <disabled>false</disabled>
+  </flow-definition>
