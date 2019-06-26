@@ -28,7 +28,7 @@ stage('Run') { // Run the built image
 
 stage('Test') { // Run tests on container
   def dockerOutput = sh (
-      script: 'curl http://192.168.15.30:8081/goaway',
+      script: 'curl http://localhost:8081/goaway',
       //script: 'curl http://localhost:8081/goaway',
       returnStdout: true
       ).trim()
@@ -51,8 +51,8 @@ stage('Push') { // Push the built image to docker hub
 
 stage ('Deploy') { // deploy to k8s
   sshagent(credentials : ['ssh_jen']) {
-     sh 'ssh -o StrictHostKeyChecking=no ubuntu@192.168.15.40 uptime'
-     sh 'ssh ubuntu@192.168.15.40 ""kubectl apply -f /home/ubuntu/k8s_repo/k8s-pod.yml""'
+     sh 'ssh -o StrictHostKeyChecking=no ubuntu@192.168.10.40 uptime'
+     sh 'ssh ubuntu@192.168.10.40 ""kubectl apply -f /home/ubuntu/k8s_repo/k8s-pod.yml""'
    }
  }
 }</script>
